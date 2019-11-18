@@ -55,7 +55,13 @@ class Player:
         return landing_height
     
     def create_binary(self,movebox):
-        board_binary = np.zeros((24,10))
+        board_binary = []
+        for i in range(24):
+            line = []
+            for z in range(10):
+                line.append(0)
+            board_binary.append(line)   
+        # board_binary = np.zeros((24,10))
         for x in range(movebox.width):
             for y in range(movebox.height):
                 if(x,y) in movebox.cells:
@@ -211,4 +217,4 @@ class RandomPlayer(Player):
         ])
 
 
-SelectedPlayer = RandomPlayer
+SelectedPlayer = Player
