@@ -1,6 +1,6 @@
 from board import Direction, Rotation, Shape
 from random import Random
-import numpy as np
+# import numpy as np
 import statistics
 
 
