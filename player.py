@@ -17,6 +17,8 @@ class Player:
         return False
     
     def test_drop(self,movebox,dest):
+        if not movebox.falling:
+            return None
         move_list = []
         if not self.apply_moves(movebox, move_list):
             num_falling = len(movebox.falling.cells)
@@ -157,6 +159,8 @@ class Player:
             for dest in move_dest_list:
                 movebox = testbox.clone()
                 height = self.test_drop(movebox,dest)
+                if height == None:
+                    return None
                 height_achieved.append([rot,dest,height]) 
         height_list = []
         for lst in height_achieved:
@@ -169,6 +173,8 @@ class Player:
         
     def choose_action(self, board):
         move = self.m_permutations(board)
+        if move == None:
+            return None
         #implement
         list_actions = []
         for i in range(move[0]):
