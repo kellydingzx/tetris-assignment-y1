@@ -1,6 +1,5 @@
 from board import Direction, Rotation, Shape
 from random import Random
-# import numpy as np
 import statistics
 
 
@@ -43,7 +42,7 @@ class Player:
         result = self.find_lowest(movebox,num_falling,num_fallen,dest)
         return result
     
-    def land_height(self,movebox,dest):
+    def heights(self,movebox):
         height_list = [0,0,0,0,0,0,0,0,0,0]
         for x in range(movebox.width):
             for y in range(movebox.height):
@@ -51,8 +50,16 @@ class Player:
                     real_height = movebox.height - y
                     if real_height > height_list[x]:
                         height_list[x] = real_height
-        landing_height = height_list[dest]
-        return landing_height
+        return height_list
+    
+    def land_height(self,movebox,dest):
+        list = self.heights(movebox)
+        height = list[dest]
+        return height
+    
+    def mean_height(self,movebox):
+        list = self.heights(movebox)
+        return sum(list)/len(list)
     
     def create_binary(self,movebox):
         board_binary = []
@@ -120,7 +127,31 @@ class Player:
                         wells = 0
             well_list.append(sum_col)
         return sum(well_list)
-     
+    
+    def row_count(self,movebox):
+        board_binary = self.create_binary(movebox)
+        count_list = []
+        for m in range(1,24):
+            count = 0
+            for n in range(10):
+                if board_binary[m][n] == 0 and board_binary[m-1][n] == 1:
+                    count += 1
+            count_list.append(count)
+        nonzero = 0
+        for x in count_list:
+            if x != 0:
+                nonzero+=1
+        return nonzero
+    
+    def hole_depth(self,movebox):
+        board_binary = self.create_binary(movebox)
+        count = 0
+        for m in range(1,24):
+            for n in range(10):
+                if board_binary[m][n] == 0 and board_binary[m-1][n] == 1:
+                    count += m
+        return count
+                 
     def find_elimination(self,movebox,num_fallen,num_falling):
         num_after = len(movebox.cells)
         lines_cancelled = (num_fallen + num_falling - num_after)//10
@@ -129,15 +160,21 @@ class Player:
         return eroded
     
     def find_lowest(self,movebox,num_falling,num_fallen,dest):
+        mean_height = self.mean_height(movebox)
         landing_height = self.land_height(movebox,dest)
         colTran_sum = self.col_transations(movebox)
         rowTran_sum = self.row_transitions(movebox)
         buried_sum = self.find_buried(movebox)
+        buried_row = self.row_count(movebox)
         well_sum = self.find_wells(movebox)
         eroded = self.find_elimination(movebox,num_fallen,num_falling)
+        holedep = self.hole_depth(movebox)
         # evaluation
         # value = (-1 * landing_height) + 1 * eroded - 1 * rowTran_sum - 1 *colTran_sum - 4 * buried_sum - 1 * well_sum
-        value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * eroded - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * buried_sum - 3.3855972247263626 * well_sum
+        # value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * eroded - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * buried_sum - 3.3855972247263626 * well_sum
+        # value = (-0.35 * landing_height) + 0.19 * eroded - 0.25 * rowTran_sum - 0.7 *colTran_sum - 0.54 * buried_sum - 0.25 * well_sum
+        value = (-0.32 * landing_height) + 0.07 * eroded - 0.28 * rowTran_sum - 0.6 *colTran_sum - 0.24 * buried_sum - 0.27 * well_sum - 0.08*holedep - 0.55*buried_row
+
         return value
     
     def m_permutations(self,board):
