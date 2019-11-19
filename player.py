@@ -63,6 +63,10 @@ class Player:
         list = self.heights(movebox)
         return statistics.stdev(list)
     
+    def max_height(self,movebox):
+        list = self.heights(movebox)
+        return max(list)
+    
     def create_binary(self,movebox):
         # inital board
         board_binary = []
@@ -162,6 +166,7 @@ class Player:
         return eroded
     
     def find_lowest(self,movebox,num_falling,num_fallen,dest):
+        max_height = self.max_height(movebox)
         mean_height = self.mean_height(movebox)
         stdiv_height = self.std_height(movebox)
         landing_height = self.land_height(movebox,dest)
@@ -174,9 +179,12 @@ class Player:
         holedep = self.hole_depth(movebox)
         # evaluation
         # value = (-1 * landing_height) + 1 * eroded - 1 * rowTran_sum - 1 *colTran_sum - 4 * buried_sum - 1 * well_sum
-        value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * eroded - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * buried_sum - 3.3855972247263626 * well_sum
+        # value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * eroded - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * buried_sum - 3.3855972247263626 * well_sum
         # value = (-0.35 * landing_height) + 0.19 * eroded - 0.25 * rowTran_sum - 0.7 *colTran_sum - 0.54 * buried_sum - 0.25 * well_sum
-        # value = (-0.32 * landing_height) + 0.07 * eroded - 0.28 * rowTran_sum - 0.6 *colTran_sum - 0.24 * buried_sum - 0.27 * well_sum - 0.08*holedep - 0.55*buried_row
+        if max_height < 8:
+            value = (-0.32 * landing_height) + 0.07 * eroded - 0.28 * rowTran_sum - 0.6 *colTran_sum - 0.24 * buried_sum - 0.27 * well_sum - 0.08*holedep - 0.55*buried_row
+        else:
+            value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * eroded - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * buried_sum - 3.3855972247263626 * well_sum
         return value
     
     def m_permutations(self,board):
