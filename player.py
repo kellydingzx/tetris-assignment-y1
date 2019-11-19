@@ -19,15 +19,13 @@ class Player:
         if not movebox.falling:
             return None
         move_list = []
-        if not self.apply_moves(movebox, move_list):
-            num_falling = len(movebox.falling.cells)
-            num_fallen = len(movebox.cells)
+        num_falling = len(movebox.falling.cells)
+        num_fallen = len(movebox.cells)
         #find out the representitive x-coordinate of the block
-        if not self.apply_moves(movebox, move_list):
-            x_rep = 10
-            for (x,y) in movebox.falling.cells:
-                if x < x_rep:
-                    x_rep = x
+        x_rep = 10
+        for (x,y) in movebox.falling.cells:
+            if x < x_rep:
+                x_rep = x
         #move the block horizontally
         moves = dest - x_rep
         if moves < 0:
@@ -54,21 +52,26 @@ class Player:
     
     def land_height(self,movebox,dest):
         list = self.heights(movebox)
-        height = list[dest] - 1.5
+        height = list[dest] 
         return height
     
     def mean_height(self,movebox):
         list = self.heights(movebox)
         return sum(list)/len(list)
     
+    def std_height(self,movebox):
+        list = self.heights(movebox)
+        return statistics.stdev(list)
+    
     def create_binary(self,movebox):
+        # inital board
         board_binary = []
         for i in range(24):
             line = []
             for z in range(10):
                 line.append(0)
             board_binary.append(line)   
-        # board_binary = np.zeros((24,10))
+        # write the board
         for x in range(movebox.width):
             for y in range(movebox.height):
                 if(x,y) in movebox.cells:
@@ -154,13 +157,13 @@ class Player:
                  
     def find_elimination(self,movebox,num_fallen,num_falling):
         num_after = len(movebox.cells)
-        lines_cancelled = (num_fallen + num_falling - num_after)//10
-        block_donated = lines_cancelled*10 - (num_fallen-num_after-num_falling)
-        eroded = lines_cancelled * block_donated  
+        lines_cancelled = (num_fallen + num_falling - num_after)/10
+        eroded = lines_cancelled
         return eroded
     
     def find_lowest(self,movebox,num_falling,num_fallen,dest):
         mean_height = self.mean_height(movebox)
+        stdiv_height = self.std_height(movebox)
         landing_height = self.land_height(movebox,dest)
         colTran_sum = self.col_transations(movebox)
         rowTran_sum = self.row_transitions(movebox)
@@ -171,10 +174,9 @@ class Player:
         holedep = self.hole_depth(movebox)
         # evaluation
         # value = (-1 * landing_height) + 1 * eroded - 1 * rowTran_sum - 1 *colTran_sum - 4 * buried_sum - 1 * well_sum
-        # value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * eroded - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * buried_sum - 3.3855972247263626 * well_sum
+        value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * eroded - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * buried_sum - 3.3855972247263626 * well_sum
         # value = (-0.35 * landing_height) + 0.19 * eroded - 0.25 * rowTran_sum - 0.7 *colTran_sum - 0.54 * buried_sum - 0.25 * well_sum
         # value = (-0.32 * landing_height) + 0.07 * eroded - 0.28 * rowTran_sum - 0.6 *colTran_sum - 0.24 * buried_sum - 0.27 * well_sum - 0.08*holedep - 0.55*buried_row
-        value = (-45 * landing_height) + 100 * eroded - 32 * rowTran_sum - 93 *colTran_sum - 90 * buried_sum - 80 * well_sum
         return value
     
     def m_permutations(self,board):
