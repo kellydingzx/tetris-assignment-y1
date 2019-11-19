@@ -187,7 +187,7 @@ class Player:
         # value_list = [value_list[i]*weight_list[i] for i in range(len(value_list))]
         # value = sum(value_list)
 
-        value = - hole_sum
+        value = - hole_sum - stdiv_height - max_height
         # else:
         #     value_list = [stdiv_height,hole_sum]
         #     weight_list = [-10,-2]
