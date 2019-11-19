@@ -181,10 +181,13 @@ class Player:
         # value = (-1 * landing_height) + 1 * eroded - 1 * rowTran_sum - 1 *colTran_sum - 4 * buried_sum - 1 * well_sum
         # value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * eroded - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * buried_sum - 3.3855972247263626 * well_sum
         # value = (-0.35 * landing_height) + 0.19 * eroded - 0.25 * rowTran_sum - 0.7 *colTran_sum - 0.54 * buried_sum - 0.25 * well_sum
-        if max_height < 8:
-            value = (-0.32 * landing_height) + 0.07 * eroded - 0.28 * rowTran_sum - 0.6 *colTran_sum - 0.24 * buried_sum - 0.27 * well_sum - 0.08*holedep - 0.55*buried_row
-        else:
-            value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * eroded - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * buried_sum - 3.3855972247263626 * well_sum
+        # value = (-0.32 * landing_height) + 0.07 * eroded - 0.28 * rowTran_sum - 0.6 *colTran_sum - 0.24 * buried_sum - 0.27 * well_sum - 0.08*holedep - 0.55*buried_row
+        value_list = [landing_height,eroded,rowTran_sum,colTran_sum,buried_sum,well_sum,holedep,buried_row]
+        weight_list = [-0.32,0.07,-0.28,-0.6,-0.24,-0.27,-0.08,-0.55]
+        value_list = [value_list[i]*weight_list[i] for i in range(len(value_list))]
+        value = sum(value_list)
+        if eroded != 0:
+            value = 1000
         return value
     
     def m_permutations(self,board):
@@ -220,13 +223,13 @@ class Player:
         for lst in height_achieved:
             height_list.append(lst[2])  
         height_min = max(height_list)
-        num = height_list.count(height_min)
         for lst in height_achieved:
             if lst[2] == height_min:
                 return [lst[0],lst[1]]
         
     def choose_action(self, board):
         move = self.m_permutations(board)
+        print(move)
         if move == None:
             return None
         #implement
