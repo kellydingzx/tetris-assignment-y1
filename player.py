@@ -172,7 +172,7 @@ class Player:
         landing_height = self.land_height(movebox,dest)
         colTran_sum = self.col_transations(movebox)
         rowTran_sum = self.row_transitions(movebox)
-        buried_sum = self.find_buried(movebox)
+        hole_sum = self.find_buried(movebox)
         buried_row = self.row_count(movebox)
         well_sum = self.find_wells(movebox)
         eroded = self.find_elimination(movebox,num_fallen,num_falling)
@@ -182,11 +182,18 @@ class Player:
         # value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * eroded - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * buried_sum - 3.3855972247263626 * well_sum
         # value = (-0.35 * landing_height) + 0.19 * eroded - 0.25 * rowTran_sum - 0.7 *colTran_sum - 0.54 * buried_sum - 0.25 * well_sum
         # value = (-0.32 * landing_height) + 0.07 * eroded - 0.28 * rowTran_sum - 0.6 *colTran_sum - 0.24 * buried_sum - 0.27 * well_sum - 0.08*holedep - 0.55*buried_row
-        value_list = [landing_height,eroded,rowTran_sum,colTran_sum,buried_sum,well_sum,holedep,buried_row]
-        weight_list = [-0.32,0.07,-0.28,-0.6,-0.24,-0.27,-0.08,-0.55]
-        value_list = [value_list[i]*weight_list[i] for i in range(len(value_list))]
-        value = sum(value_list)
-        if eroded != 0:
+        # value_list = [landing_height,eroded,rowTran_sum,colTran_sum,buried_sum,well_sum,holedep,buried_row]
+        # weight_list = [-0.32,0.07,-0.28,-0.6,-0.24,-0.27,-0.08,-0.55]
+        # value_list = [value_list[i]*weight_list[i] for i in range(len(value_list))]
+        # value = sum(value_list)
+
+        value = - hole_sum
+        # else:
+        #     value_list = [stdiv_height,hole_sum]
+        #     weight_list = [-10,-2]
+        #     value_list = [value_list[i]*weight_list[i] for i in range(len(value_list))]
+        #     value = sum(value_list)
+        if eroded !=0:
             value = 1000
         return value
     
