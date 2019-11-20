@@ -2,9 +2,10 @@ from board import Direction, Rotation, Shape
 from random import Random
 import statistics
 
-# reference: El-Tetris – An Improvement on Pierre Dellacherie’s Algorithm
+# reference 1: El-Tetris – An Improvement on Pierre Dellacherie’s Algorithm
 # https://imake.ninja/el-tetris-an-improvement-on-pierre-dellacheries-algorithm/ 
 # date of access: 20/11/2019
+# reference 2: Amine Boumaza. How to design good Tetris players. 2013. hal-00926213
 
 class Player:
     def apply_moves(self, board, moves):
@@ -108,6 +109,8 @@ class Player:
                     holes += 1
             if holes != None:
                 buried_list.append(holes)
+            else:
+                buried_list.append(0)
         return sum(buried_list)
             
     def find_wells(self,movebox):
