@@ -30,7 +30,6 @@ class Player:
         for tup in movebox.falling.cells:
             if tup[0] < x_rep:
                 x_rep = tup[0]
-        print(x_rep)
         #move the block horizontally
         moves = dest - x_rep
         if moves < 0:
@@ -109,10 +108,10 @@ class Player:
                 #     holes = 0
                 # if holes != None and board_binary[m][n] == 0:
                 #     holes += 1
-            if holes != None:
-                buried_list.append(holes)
-            else:
-                buried_list.append(0)
+            # if holes != None:
+            #     buried_list.append(holes)
+            # else:
+            buried_list.append(holes)
         return sum(buried_list)
             
     def find_wells(self,movebox):
@@ -126,9 +125,9 @@ class Player:
                 if board_binary[m][n] == 0:
                     if (n-1<0 or board_binary[m][n-1] == 1) and (n+1 >= 10 or board_binary[m][n+1] == 1):
                         well += 1
-                    else:
-                        sum_col += sum_n[well]
-                        wells = 0
+                    # else:
+                    #     sum_col += sum_n[well]
+                    #     wells = 0
             well_list.append(sum_col)
         return sum(well_list)
           
