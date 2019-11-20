@@ -120,7 +120,7 @@ class Player:
         sum_n = [0,1,3,6,10,15,21,28,36,45,55,66,78,91,105,120,136,153,171,190,210,231,253,276,300]
         for n in range(movebox.width):
             well = 0
-            sum_col = 0
+            # sum_col = 0
             for m in range(movebox.height):
                 if board_binary[m][n] == 0:
                     if (n-1<0 or board_binary[m][n-1] == 1) and (n+1 >= 10 or board_binary[m][n+1] == 1):
@@ -128,7 +128,7 @@ class Player:
                     # else:
                     #     sum_col += sum_n[well]
                     #     wells = 0
-            well_list.append(sum_col)
+            well_list.append(well)
         return sum(well_list)
           
     def find_elimination(self,movebox,num_fallen,num_falling):
