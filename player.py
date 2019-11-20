@@ -101,12 +101,14 @@ class Player:
         board_binary = self.create_binary(movebox)
         buried_list = [] 
         for n in range(movebox.width):
-            holes = None
+            holes = 0
             for m in range(movebox.height):
-                if holes == None and board_binary[m][n] == 1 :
-                    holes = 0
-                if holes != None and board_binary[m][n] == 0:
+                if board_binary[m][n] == 0 and (m-1<0 or board_binary[m-1][n] == 1):
                     holes += 1
+                # if holes == None and board_binary[m][n] == 1 :
+                #     holes = 0
+                # if holes != None and board_binary[m][n] == 0:
+                #     holes += 1
             if holes != None:
                 buried_list.append(holes)
             else:
