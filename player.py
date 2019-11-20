@@ -123,10 +123,11 @@ class Player:
             for m in range(movebox.height):
                 if board_binary[m][n] == 0:
                     if (n-1<0 or board_binary[m][n-1] == 1) and (n+1 >= 10 or board_binary[m][n+1] == 1):
-                        well += 1
-                    else:
-                        sum_col += sum_n[well]
-                        wells = 0
+                        sum_col += 1
+                    # else:
+                        # sum_col += well
+                        # sum_n[well]
+                        # wells = 0
             well_list.append(sum_col)
         return sum(well_list)
           
@@ -151,7 +152,7 @@ class Player:
         sandbox = board.clone()
         rotate_list = []
         if sandbox.falling.shape == Shape.I:
-            rotate_list = [0,1,2]  
+            rotate_list = [0,1]  
         elif sandbox.falling.shape == Shape.J:
             rotate_list = [0,1,2,3]
         elif sandbox.falling.shape == Shape.L:
