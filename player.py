@@ -2,6 +2,8 @@ from board import Direction, Rotation, Shape
 from random import Random
 import statistics
 
+# reference: https://imake.ninja/el-tetris-an-improvement-on-pierre-dellacheries-algorithm/ 
+# date of access: 20/11/2019
 
 class Player:
     def apply_moves(self, board, moves):
@@ -38,7 +40,7 @@ class Player:
                 move_list.append(Direction.Right)
         if not self.apply_moves(movebox, move_list):
             movebox.move(Direction.Drop)
-        result = self.find_lowest(movebox,num_falling,num_fallen,dest)
+        result = self.evaluate(movebox,num_falling,num_fallen,dest)
         return result
     
     def heights(self,movebox):
@@ -55,18 +57,6 @@ class Player:
         list = self.heights(movebox)
         height = list[dest] 
         return height
-    
-    def mean_height(self,movebox):
-        list = self.heights(movebox)
-        return sum(list)/len(list)
-    
-    def std_height(self,movebox):
-        list = self.heights(movebox)
-        return statistics.stdev(list)
-    
-    def max_height(self,movebox):
-        list = self.heights(movebox)
-        return max(list)
     
     def create_binary(self,movebox):
         # inital board
@@ -135,60 +125,22 @@ class Player:
                         wells = 0
             well_list.append(sum_col)
         return sum(well_list)
-    
-    def row_count(self,movebox):
-        board_binary = self.create_binary(movebox)
-        count_list = []
-        for m in range(1,24):
-            count = 0
-            for n in range(10):
-                if board_binary[m][n] == 0 and board_binary[m-1][n] == 1:
-                    count += 1
-            count_list.append(count)
-        nonzero = 0
-        for x in count_list:
-            if x != 0:
-                nonzero+=1
-        return nonzero
-    
-    def hole_depth(self,movebox):
-        board_binary = self.create_binary(movebox)
-        count = 0
-        for m in range(1,24):
-            for n in range(10):
-                if board_binary[m][n] == 0 and board_binary[m-1][n] == 1:
-                    count += m
-        return count
-                 
+          
     def find_elimination(self,movebox,num_fallen,num_falling):
         num_after = len(movebox.cells)
         lines_cancelled = (num_fallen + num_falling - num_after)/10
-        eroded = lines_cancelled
-        return eroded
+        return lines_cancelled
     
-    def bottom_row(self,movebox):
-        binary_board = self.create_binary(movebox)
-        count = 0
-        for x in binary_board[23]:
-            if x == 0:
-                count += 1
-        return count
     
-    def find_lowest(self,movebox,num_falling,num_fallen,dest):
-        max_height = self.max_height(movebox)
-        mean_height = self.mean_height(movebox)
-        stdiv_height = self.std_height(movebox)
+    def evaluate(self,movebox,num_falling,num_fallen,dest):
         landing_height = self.land_height(movebox,dest)
         colTran_sum = self.col_transations(movebox)
         rowTran_sum = self.row_transitions(movebox)
         hole_sum = self.find_buried(movebox)
-        buried_row = self.row_count(movebox)
         well_sum = self.find_wells(movebox)
-        eroded = self.find_elimination(movebox,num_fallen,num_falling)
-        holedep = self.hole_depth(movebox)
-        b_row = self.bottom_row(movebox)
+        cancelled = self.find_elimination(movebox,num_fallen,num_falling)
         # evaluation
-        value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * eroded - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * hole_sum - 3.3855972247263626 * well_sum
+        value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * cancelled - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * hole_sum - 3.3855972247263626 * well_sum
         return value
         
     def m_permutations(self,board):
@@ -209,23 +161,23 @@ class Player:
         elif sandbox.falling.shape == Shape.Z:
             rotate_list = [0,1,2]
         move_dest_list = [0,1,2,3,4,5,6,7,8,9]
-        height_achieved = []
+        evaluation_achieved = []
         for rot in rotate_list:
             testbox = sandbox.clone()
             for i in range(rot):
                 testbox.rotate(Rotation.Clockwise)
             for dest in move_dest_list:
                 movebox = testbox.clone()
-                height = self.test_drop(movebox,dest)
-                if height == None:
+                evaluation = self.test_drop(movebox,dest)
+                if evaluation == None:
                     return None
-                height_achieved.append([rot,dest,height]) 
-        height_list = []
-        for lst in height_achieved:
-            height_list.append(lst[2])  
-        height_min = max(height_list)
-        for lst in height_achieved:
-            if lst[2] == height_min:
+                evaluation_achieved.append([rot,dest,evaluation]) 
+        evaluation_list = []
+        for lst in evaluation_achieved:
+            evaluation_list.append(lst[2])  
+        evaluation_min = max(evaluation_list)
+        for lst in evaluation_achieved:
+            if lst[2] == evaluation_min:
                 return [lst[0],lst[1]]
             
     def action_list(self,board):
@@ -253,8 +205,6 @@ class Player:
         return list_actions
     
     def choose_action(self, board):
-        move = self.m_permutations(board)
-        #implement
         list_actions = self.action_list(board)
         if list_actions == None:
             return None
