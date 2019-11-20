@@ -2,7 +2,8 @@ from board import Direction, Rotation, Shape
 from random import Random
 import statistics
 
-# reference: https://imake.ninja/el-tetris-an-improvement-on-pierre-dellacheries-algorithm/ 
+# reference: El-Tetris – An Improvement on Pierre Dellacherie’s Algorithm
+# https://imake.ninja/el-tetris-an-improvement-on-pierre-dellacheries-algorithm/ 
 # date of access: 20/11/2019
 
 class Player:
@@ -113,10 +114,10 @@ class Player:
         board_binary = self.create_binary(movebox)
         well_list = [] 
         sum_n = [0,1,3,6,10,15,21,28,36,45,55]
-        for m in range(movebox.height):
+        for n in range(movebox.width):
             well = 0
             sum_col = 0
-            for n in range(movebox.width):
+            for m in range(movebox.height):
                 if board_binary[m][n] == 0:
                     if (n-1<0 or board_binary[m][n-1] == 1) and (n+1 >= 10 or board_binary[m][n+1] == 1):
                         well += 1
