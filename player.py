@@ -116,7 +116,7 @@ class Player:
     def find_wells(self,movebox):
         board_binary = self.create_binary(movebox)
         well_list = [] 
-        sum_n = [0,1,3,6,10,15,21,28,36,45,55]
+        sum_n = [0,1,3,6,10,15,21,28,36,45,55,66,78,91,105,120,136,153,171,190,210,231,253,276,300]
         for n in range(movebox.width):
             well = 0
             sum_col = 0
