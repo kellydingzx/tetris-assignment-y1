@@ -256,6 +256,8 @@ class Player:
         move = self.m_permutations(board)
         #implement
         list_actions = self.action_list(board)
+        if list_actions == None:
+            return None
         if self.apply_moves(board,list_actions):
             return list_actions
         
