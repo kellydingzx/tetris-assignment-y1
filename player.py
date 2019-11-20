@@ -123,11 +123,10 @@ class Player:
             for m in range(movebox.height):
                 if board_binary[m][n] == 0:
                     if (n-1<0 or board_binary[m][n-1] == 1) and (n+1 >= 10 or board_binary[m][n+1] == 1):
-                        sum_col += 1
-                    # else:
-                        # sum_col += well
-                        # sum_n[well]
-                        # wells = 0
+                        well += 1
+                    else:
+                        sum_col += sum_n[well]
+                        wells = 0
             well_list.append(sum_col)
         return sum(well_list)
           
