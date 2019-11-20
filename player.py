@@ -8,7 +8,7 @@ import statistics
 # https://pdfs.semanticscholar.org/2d0d/eb544439e96f9f84fe1afc653bbf2f3bcc96.pdf
 # date of access: 20/11/2019
 
-class Player:
+class Player:  
     def apply_moves(self, board, moves):
         # apply the elements in moves to the board.
         for move in moves:
