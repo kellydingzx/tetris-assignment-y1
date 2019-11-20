@@ -145,7 +145,9 @@ class Player:
         well_sum = self.find_wells(movebox)
         cancelled = self.find_elimination(movebox,num_fallen,num_falling)
         # evaluation
-        value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * cancelled - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * hole_sum - 3.3855972247263626 * well_sum
+        # value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * cancelled - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * hole_sum - 3.3855972247263626 * well_sum
+        value = (-3.3200740 * landing_height) + 2.70317569 * cancelled - 2.7157289 * rowTran_sum - 5.1061407 *colTran_sum - 6.9380080 * hole_sum - 2.4075407 * well_sum
+
         return value
         
     def m_permutations(self,board):
