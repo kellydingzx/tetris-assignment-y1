@@ -2,10 +2,11 @@ from board import Direction, Rotation, Shape
 from random import Random
 import statistics
 
-# reference 1: El-Tetris – An Improvement on Pierre Dellacherie’s Algorithm
-# https://imake.ninja/el-tetris-an-improvement-on-pierre-dellacheries-algorithm/ 
+# reference:
+# CS 6601 - Artificial intelligence, Mini-project paper
+# Improvement on a Tetris Agent
+# https://pdfs.semanticscholar.org/2d0d/eb544439e96f9f84fe1afc653bbf2f3bcc96.pdf
 # date of access: 20/11/2019
-# reference 2: Amine Boumaza. How to design good Tetris players. 2013. hal-00926213
 
 class Player:
     def apply_moves(self, board, moves):
@@ -41,6 +42,7 @@ class Player:
                 move_list.append(Direction.Right)
         if not self.apply_moves(movebox, move_list):
             movebox.move(Direction.Drop)
+
         result = self.evaluate(movebox,num_falling,num_fallen,dest)
         return result
     
@@ -104,30 +106,18 @@ class Player:
             for m in range(movebox.height):
                 if board_binary[m][n] == 0 and (m-1<0 or board_binary[m-1][n] == 1):
                     holes += 1
-                # if holes == None and board_binary[m][n] == 1 :
-                #     holes = 0
-                # if holes != None and board_binary[m][n] == 0:
-                #     holes += 1
-            # if holes != None:
-            #     buried_list.append(holes)
-            # else:
             buried_list.append(holes)
         return sum(buried_list)
             
     def find_wells(self,movebox):
         board_binary = self.create_binary(movebox)
         well_list = [] 
-        sum_n = [0,1,3,6,10,15,21,28,36,45,55,66,78,91,105,120,136,153,171,190,210,231,253,276,300]
         for n in range(movebox.width):
             well = 0
-            # sum_col = 0
             for m in range(movebox.height):
                 if board_binary[m][n] == 0:
                     if (n-1<0 or board_binary[m][n-1] == 1) and (n+1 >= 10 or board_binary[m][n+1] == 1):
                         well += 1
-                    # else:
-                    #     sum_col += sum_n[well]
-                    #     wells = 0
             well_list.append(well)
         return sum(well_list)
           
@@ -145,9 +135,7 @@ class Player:
         well_sum = self.find_wells(movebox)
         cancelled = self.find_elimination(movebox,num_fallen,num_falling)
         # evaluation
-        # value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * cancelled - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * hole_sum - 3.3855972247263626 * well_sum
         value = (-3.3200740 * landing_height) + 2.70317569 * cancelled - 2.7157289 * rowTran_sum - 5.1061407 *colTran_sum - 6.9380080 * hole_sum - 2.4075407 * well_sum
-
         return value
         
     def m_permutations(self,board):
