@@ -23,9 +23,10 @@ class Player:
         num_fallen = len(movebox.cells)
         #find out the representitive x-coordinate of the block
         x_rep = 10
-        for (x,y) in movebox.falling.cells:
-            if x < x_rep:
-                x_rep = x
+        for tup in movebox.falling.cells:
+            if tup[0] < x_rep:
+                x_rep = tup[0]
+        print(x_rep)
         #move the block horizontally
         moves = dest - x_rep
         if moves < 0:
@@ -165,6 +166,14 @@ class Player:
         eroded = lines_cancelled
         return eroded
     
+    def bottom_row(self,movebox):
+        binary_board = self.create_binary(movebox)
+        count = 0
+        for x in binary_board[23]:
+            if x == 0:
+                count += 1
+        return count
+    
     def find_lowest(self,movebox,num_falling,num_fallen,dest):
         max_height = self.max_height(movebox)
         mean_height = self.mean_height(movebox)
@@ -177,31 +186,16 @@ class Player:
         well_sum = self.find_wells(movebox)
         eroded = self.find_elimination(movebox,num_fallen,num_falling)
         holedep = self.hole_depth(movebox)
+        b_row = self.bottom_row(movebox)
         # evaluation
-        # value = (-1 * landing_height) + 1 * eroded - 1 * rowTran_sum - 1 *colTran_sum - 4 * buried_sum - 1 * well_sum
-        # value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * eroded - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * buried_sum - 3.3855972247263626 * well_sum
-        # value = (-0.35 * landing_height) + 0.19 * eroded - 0.25 * rowTran_sum - 0.7 *colTran_sum - 0.54 * buried_sum - 0.25 * well_sum
-        # value = (-0.32 * landing_height) + 0.07 * eroded - 0.28 * rowTran_sum - 0.6 *colTran_sum - 0.24 * buried_sum - 0.27 * well_sum - 0.08*holedep - 0.55*buried_row
-        # value_list = [landing_height,eroded,rowTran_sum,colTran_sum,buried_sum,well_sum,holedep,buried_row]
-        # weight_list = [-0.32,0.07,-0.28,-0.6,-0.24,-0.27,-0.08,-0.55]
-        # value_list = [value_list[i]*weight_list[i] for i in range(len(value_list))]
-        # value = sum(value_list)
-
-        value = - hole_sum - stdiv_height - max_height
-        # else:
-        #     value_list = [stdiv_height,hole_sum]
-        #     weight_list = [-10,-2]
-        #     value_list = [value_list[i]*weight_list[i] for i in range(len(value_list))]
-        #     value = sum(value_list)
-        if eroded !=0:
-            value = 1000
+        value = (-4.500158825082766 * landing_height) + 3.4181268101392694 * eroded - 3.2178882868487753 * rowTran_sum - 9.348695305445199 *colTran_sum - 7.899265427351652 * hole_sum - 3.3855972247263626 * well_sum
         return value
-    
+        
     def m_permutations(self,board):
         sandbox = board.clone()
         rotate_list = []
         if sandbox.falling.shape == Shape.I:
-            rotate_list = [0,1]  
+            rotate_list = [0,1,2]  
         elif sandbox.falling.shape == Shape.J:
             rotate_list = [0,1,2,3]
         elif sandbox.falling.shape == Shape.L:
@@ -233,20 +227,20 @@ class Player:
         for lst in height_achieved:
             if lst[2] == height_min:
                 return [lst[0],lst[1]]
-        
-    def choose_action(self, board):
+            
+    def action_list(self,board):
         move = self.m_permutations(board)
-        print(move)
         if move == None:
             return None
-        #implement
+        final_board = board.clone()
         list_actions = []
         for i in range(move[0]):
+            final_board.rotate(Rotation.Clockwise)
             list_actions.append(Rotation.Clockwise)
         x_rep = 10
-        for (x,y) in board.falling.cells:
-            if x < x_rep:
-                x_rep = x
+        for tup in final_board.falling.cells:
+            if tup[0] < x_rep:
+                x_rep = tup[0]
         moves = move[1] - x_rep
         if moves < 0:
             moves = -moves
@@ -256,6 +250,12 @@ class Player:
             for i in range(moves):
                 list_actions.append(Direction.Right)
         list_actions.append(Direction.Drop)
+        return list_actions
+    
+    def choose_action(self, board):
+        move = self.m_permutations(board)
+        #implement
+        list_actions = self.action_list(board)
         if self.apply_moves(board,list_actions):
             return list_actions
         
